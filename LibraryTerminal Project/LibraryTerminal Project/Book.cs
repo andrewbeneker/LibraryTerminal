@@ -11,8 +11,10 @@ namespace LibraryTerminal_Project
     {
         public string Title { get; set; }
         public string Author { get; set; }
+        // IBSN and Dewey
         public Status Status { get; set; } //TODO: make into an enum with different statuses  
         public DateTime? DueDate { get; private set; } = null;
+        public DeweyDecimal? DeweyDecimal { get; set; }
 
         public Book(string title, string author, Status status)
         {
@@ -21,19 +23,31 @@ namespace LibraryTerminal_Project
             Status = status;
             DueDate = AssignDueDate();
         }
-
-        public DateTime? AssignDueDate(Book book)
+        public Book(string title, string author, Status status, DateTime? dueDate)
         {
-            if (book.Status == Status.CheckedOut && DueDate == null)
+            Title = title;
+            Author = author;
+            Status = status;
+            DueDate = dueDate;
+        }
+
+        public DateTime? AssignDueDate()
+        {
+            if (Status == Status.CheckedOut && DueDate == null)
             {
                 DateTime dueDate;
                 dueDate = DateTime.Today.AddDays(2 * 7);
                 //wanna add a specific time of 5:00PM but can't figure out rn.
                 return DueDate = dueDate;
+            } else if (Status == Status.CheckedOut && DueDate != null)
+            {
+                return DueDate;
             }
             else return null;
 
         }
+        //Get rid of pointless priv Assignmethod
+        /*
         private DateTime? AssignDueDate()
         {
             if (Status == Status.CheckedOut && DueDate == null)
@@ -51,9 +65,15 @@ namespace LibraryTerminal_Project
                         Console.WriteLine($"Invalid Input; please enter a due date for {Title} (e.g. 12/12/2012):");
                     }
                 }
-                return DueDate = dueDate;   
-            }else return null;
+                return DueDate = dueDate;
+            }
+            else if (Status == Status.CheckedOut && DueDate != null)
+            {
+                return DueDate;
+            }
+            else return null;
         }
+        */
 
     }
 }
