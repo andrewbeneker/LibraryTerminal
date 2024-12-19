@@ -294,11 +294,14 @@ void CartMenu()
     }
     else
     {
-        Console.WriteLine("oops! cart is empty!\n Goodybye!");
-        Console.WriteLine("return a book");
-
-        ReturnBook();
+        Console.Clear();
+        Console.WriteLine("oops! cart is empty!");
+        Console.WriteLine("returning to main menu!");
+        Console.ReadKey();
+        Console.Clear();
+        MainMenu();
     }
+    
 }
 
 
