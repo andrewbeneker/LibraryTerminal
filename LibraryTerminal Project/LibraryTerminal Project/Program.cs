@@ -68,7 +68,6 @@ try
                 //COME BACK TO LATER
                 Book book = new Book(parts[0], parts[1], (Status)int.Parse(parts[2]), string.IsNullOrEmpty(parts[3]) ? null : parts[3], !string.IsNullOrEmpty(parts[4]) ? (DeweyDecimal)int.Parse(parts[4]) : null);
                 catalog.Books.Add(book);
-
             }
         }
     }
@@ -89,6 +88,7 @@ catch (FileNotFoundException)
             new Book("Night", "Elie Wiesel", Status.OutOfStock), new Book("This Is Not a Personal Statement", "Tracy Badua", Status.CheckedOut),
             new Book("The Odyssey", "Homer", Status.OnShelf),
     };
+    catalog.Books.AddRange(prePickedBooks);
 }
 
 
@@ -181,7 +181,7 @@ else
     ReturnBook();
 }
 
-//ADD RETURN METHOD || CHCECK
+
 
 
 
@@ -194,8 +194,7 @@ using (StreamWriter catalogWriter = new StreamWriter("catalog_File.txt", false))
     {
         catalogWriter.WriteLine(book.ToString());
 
-    }
-    
+    }  
 }
 
 
