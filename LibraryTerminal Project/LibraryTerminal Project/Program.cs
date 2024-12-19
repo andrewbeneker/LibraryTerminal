@@ -52,6 +52,8 @@ string choice = "";
 //ADD USER INFO COLLECTION BEFORE MENU
 
 
+
+
 try
 {
     using (StreamReader reader = new StreamReader("catalog_File.txt"))
@@ -91,11 +93,141 @@ catch (FileNotFoundException)
     catalog.Books.AddRange(prePickedBooks);
 }
 
+Console.WriteLine("Welcome to the T.A.C Library!");
+Console.ReadKey();
+Console.Clear();
+
+bool continueMenu = true;
+
+while (continueMenu == true)
+{
+    MainMenu();
+    Console.WriteLine("Would you like to continue browsing for books? (y/n)");
+    string continueBrowse = Console.ReadLine();
+    if (continueBrowse == "n" && cart.Count == 0)
+    {
+        continueMenu = false;
+        Console.WriteLine("Press any key to exit the library.");
+        Console.ReadKey();
+        Console.Clear();
+
+    }
+    else if (continueBrowse == "n" && cart.Count > 0)
+    {
+        continueMenu = false;
+        CartMenu();
+        CheckOut(cart);
+        Console.Clear();
+
+    }
+    else
+    {
+        Console.Clear();
+    }
+};
+
+
+void MainMenu()
+{
+    Console.WriteLine("MAIN MENU");
+    Console.WriteLine("Please choose one of the following options, by selecting the number for that option:");
+
+    Console.WriteLine("1. Search for titles");
+    Console.WriteLine("2. Display Library");
+    Console.WriteLine("3. Display Cart");
+    Console.WriteLine("4. Checkout");
+    Console.WriteLine("5. Return a Book/Books");
+    Console.WriteLine("6. Annihilate Library...");
+    string menuChoice = Console.ReadLine();
+    switch (menuChoice)
+    {
+        case "1":
+            Console.Clear();
+            QueryCatalog();
+
+            break;
+        case "2":
+            Console.Clear();
+            catalog.AlphabetizeCatalog();
+            catalog.DisplayAllBooks();
+
+            break;
+        case "3":
+            Console.Clear();
+            CartMenu();
+
+            break;
+        case "4":
+            Console.Clear();
+            continueMenu = false;
+            CartMenu();
+            break;
+        case "5":
+            Console.Clear();
+            ReturnBook();
+            break;
+        case "6":
+            Console.Clear();
+            Console.WriteLine("Are you sure you want to destroy the library? (This action cannot be undone) Select (y/n)");
+            string destroyLibrary = Console.ReadLine();
+            if (destroyLibrary == "y")
+            {
+                continueMenu = false;
+                Console.Clear();
+                DestroyLibrary();
+                catalog.Books.Clear();
+                cart.Clear();
+                Console.WriteLine("All the books in the library have been obliterated. The world is now safe from learning.");
+                Console.WriteLine("Press any key to forget libraries ever existed.");
+                Console.ReadKey();
+                Console.Clear();
+            }
+            else { }
+            break;
+        default:
+            Console.WriteLine("That is not a valid option. Please select a number which corresponds to a menu item");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            Console.Clear();
+            break;
+    }
+
+}
+
+
+void DestroyLibrary()
+{
+    while (catalog.Books.Count > 0)
+    {
+        for (int i = 0; i < catalog.Books.Count; i--)
+        {
+            Console.WriteLine("Press any key to burn the books.");
+            if (catalog.Books.Count > 0)
+            {
+                catalog.Books.RemoveAt(0);
+                foreach (Book book in catalog.Books)
+                {
+                    Console.WriteLine(book.Title);
+
+                }
+                Console.ReadKey();
+                Console.Clear();
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("All the books have been burned. I hope you're happy!");
+                Console.ReadKey(false);
+                break;
+            }
+        }
+    }
+}
 
 
 
 
-
+/*
 while (true)
 {
     Console.WriteLine("");
@@ -135,50 +267,54 @@ while (true)
         break;
     }
 }
-
+*/
 Console.Clear();
-if (cart.Count > 0)
-{
-    Console.WriteLine("Your cart has:");
-    foreach (Book book in cart)
-    {
-        Console.WriteLine($"{book.Title} by {book.Author} \n\tStatus: {book.Status} {(book.Status == Status.CheckedOut ? $"Estimated Date of Return {book.DueDate}" : "")}");
-        Console.WriteLine("");
 
-    }
-    while (true)
+void CartMenu()
     {
-        Console.WriteLine("Are there any items you would like to remove from your cart? (\"y\" or \"n\")");
-        choice = AnswerYOrN();
-        if (choice == "y")
+    if (cart.Count > 0)
+    {
+        Console.WriteLine("Your cart has:");
+        foreach (Book book in cart)
         {
-            Console.WriteLine("Select an item by number to remove it from your cart.");
-            RemoveFromCart(cart);
-            Console.WriteLine("Would you like to remove any more?(\"y\"  or \"n\")");
+            Console.WriteLine($"{book.Title} by {book.Author} \n\tStatus: {book.Status} {(book.Status == Status.CheckedOut ? $"Estimated Date of Return {book.DueDate}" : "")}");
+            Console.WriteLine("");
+
+        }
+        while (true)
+        {
+            Console.WriteLine("Are there any items you would like to remove from your cart? (\"y\" or \"n\")");
+            choice = AnswerYOrN();
             if (choice == "y")
             {
-                continue;
+                Console.WriteLine("Select an item by number to remove it from your cart.");
+                RemoveFromCart(cart);
+                Console.WriteLine("Would you like to remove any more?(\"y\"  or \"n\")");
+                if (choice == "y")
+                {
+                    continue;
+                }
+                else if (choice == "n")
+                {
+                    CheckOut(cart);
+                    break;
+                }
+
             }
             else if (choice == "n")
             {
                 CheckOut(cart);
                 break;
             }
-
-        }
-        else if (choice == "n")
-        {
-            CheckOut(cart);
-            break;
         }
     }
-}
-else
-{
-    Console.WriteLine("oops! cart is empty!\n Goodybye!");
-    Console.WriteLine("return a book");
+    else
+    {
+        Console.WriteLine("oops! cart is empty!\n Goodybye!");
+        Console.WriteLine("return a book");
 
-    ReturnBook();
+        ReturnBook();
+    }
 }
 
 
