@@ -45,25 +45,31 @@ try
         Book defaultBook = new Book();
         catalog.Books.Clear();
         string line;
-        while ((line = reader.ReadLine()) != null)
-        {
-
-            string[] parts = line.Split("|");
-            if (parts.Length == 5 || parts.Length == 4)
-            {
-                //COME BACK TO LATER
-                Book book = new Book(parts[0], parts[1], (Status)int.Parse(parts[2]), string.IsNullOrEmpty(parts[3]) ? null : parts[3], !string.IsNullOrEmpty(parts[4]) ? (DeweyDecimal)int.Parse(parts[4]) : null);
-                catalog.Books.Add(book);
-            }
-            Console.WriteLine("Library catalog is accounted for ");
-        }
         if ((line = reader.ReadLine()) == null)
         {
             Console.WriteLine("Library is suspiciously empty...\n" +
         "Using backup catalog.");
-
+            catalog.Books.Clear();
             catalog.Books.AddRange(prePickedBooks);
         }
+        else
+        {
+            while ((line = reader.ReadLine()) != null)
+            {
+
+                string[] parts = line.Split("|");
+                if (parts.Length == 5 || parts.Length == 4)
+                {
+                    //COME BACK TO LATER
+                    Book book = new Book(parts[0], parts[1], (Status)int.Parse(parts[2]), string.IsNullOrEmpty(parts[3]) ? null : parts[3], !string.IsNullOrEmpty(parts[4]) ? (DeweyDecimal)int.Parse(parts[4]) : null);
+                    catalog.Books.Add(book);
+                }
+
+            }
+        }
+
+        Console.WriteLine("Library catalog is accounted for. ");
+
     }
 }
 catch (FileNotFoundException)
@@ -86,7 +92,7 @@ while (continueMenu == true)
 {
     MainMenu();
     Console.WriteLine("Would you like to continue browsing for books? (y/n)");
-    string continueBrowse = Console.ReadLine();
+    string continueBrowse = AnswerYOrN();
     if (continueBrowse == "n" && cart.Count == 0)
     {
         continueMenu = false;
@@ -99,7 +105,15 @@ while (continueMenu == true)
     {
         continueMenu = false;
         CartMenu();
-        CheckOut(cart);
+        try
+        {
+            CheckOut(cart);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            break;
+        }
+
         Console.Clear();
 
     }
@@ -211,47 +225,7 @@ void DestroyLibrary()
 
 
 
-/*
-while (true)
-{
-    Console.WriteLine("");
-    Console.WriteLine("Do you want a list of our catalog displayed before your search?(\"y\" or \"n\")");
-    choice = AnswerYOrN();
-    Console.Clear();
-    userCatalogQuery = "";
-    if (choice == "y")
-    {
-        catalog.DisplayAllBooks();
-        Console.WriteLine("Would you like to select a book directly from this list?(\"y\" for list selection and \"n\" for keyword query)");
-        choice = AnswerYOrN();
-        if (choice == "y")
-        {
-            Console.Clear();
-            StageCheckOut(SelectFromList(catalog.Books));
-        }
-        else if (choice == "n")
-        {
-            Console.Clear();
-            QueryCatalog();
-        }
 
-    }
-    else if (choice == "n")
-    {
-        QueryCatalog();
-    }
-    Console.WriteLine("Would you like to select anything else to to add to your cart?");
-    choice = AnswerYOrN();
-    if (choice == "y")
-    {
-        queriedMatchingBooks.Books.Clear();
-    }
-    else
-    {
-        break;
-    }
-}
-*/
 Console.Clear();
 
 void CartMenu()
@@ -274,6 +248,7 @@ void CartMenu()
                 Console.WriteLine("Select an item by number to remove it from your cart.");
                 RemoveFromCart(cart);
                 Console.WriteLine("Would you like to remove any more?(\"y\"  or \"n\")");
+                choice = AnswerYOrN();
                 if (choice == "y")
                 {
                     continue;
@@ -294,10 +269,7 @@ void CartMenu()
     }
     else
     {
-        Console.WriteLine("oops! cart is empty!\n Goodybye!");
-        Console.WriteLine("return a book");
-
-        ReturnBook();
+        Console.WriteLine("oops! cart is empty!");
     }
 }
 
@@ -310,6 +282,7 @@ void CartMenu()
 
 using (StreamWriter catalogWriter = new StreamWriter("catalog_File.txt", false))
 {
+
     foreach (Book book in catalog.Books)
     {
         catalogWriter.WriteLine(book.ToString());
@@ -461,7 +434,13 @@ List<Book> CheckOut(List<Book> cart)
         Console.WriteLine($"{book.Title} by {book.Author}");
 
     }
-    Console.WriteLine($"They are all due: {CheckedOutBooks[0].DueDate}");
+    try
+    {
+        Console.WriteLine($"They are all due: {CheckedOutBooks[0].DueDate}");
+    } catch (ArgumentOutOfRangeException)
+    {
+        Console.WriteLine("There's no book in the cart.");
+    }
     return CheckedOutBooks;
 }
 
@@ -689,3 +668,45 @@ static void SaveLibrary(List<Book> library)
     }
     else // keyword query functionality
     {*/
+//DEBUG/ PRIOR MAIN 
+/*
+while (true)
+{
+    Console.WriteLine("");
+    Console.WriteLine("Do you want a list of our catalog displayed before your search?(\"y\" or \"n\")");
+    choice = AnswerYOrN();
+    Console.Clear();
+    userCatalogQuery = "";
+    if (choice == "y")
+    {
+        catalog.DisplayAllBooks();
+        Console.WriteLine("Would you like to select a book directly from this list?(\"y\" for list selection and \"n\" for keyword query)");
+        choice = AnswerYOrN();
+        if (choice == "y")
+        {
+            Console.Clear();
+            StageCheckOut(SelectFromList(catalog.Books));
+        }
+        else if (choice == "n")
+        {
+            Console.Clear();
+            QueryCatalog();
+        }
+
+    }
+    else if (choice == "n")
+    {
+        QueryCatalog();
+    }
+    Console.WriteLine("Would you like to select anything else to to add to your cart?");
+    choice = AnswerYOrN();
+    if (choice == "y")
+    {
+        queriedMatchingBooks.Books.Clear();
+    }
+    else
+    {
+        break;
+    }
+}
+*/
