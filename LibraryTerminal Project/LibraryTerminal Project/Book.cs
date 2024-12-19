@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -16,6 +18,15 @@ namespace LibraryTerminal_Project
         public DateTime? DueDate { get; private set; } = null;
         public DeweyDecimal? DeweyDecimal { get; set; }
 
+        public Book()
+        {
+            // made for a default book value just so vars can be called
+            Title = string.Empty;
+            Author = string.Empty;
+            Status = Status.OutOfStock;
+            DueDate = null;
+            DeweyDecimal = null;
+        }
         public Book(string title, string author, Status status)
         {
             Title = title;
@@ -23,12 +34,46 @@ namespace LibraryTerminal_Project
             Status = status;
             DueDate = AssignDueDate();
         }
+        /*
         public Book(string title, string author, Status status, DateTime? dueDate)
         {
             Title = title;
             Author = author;
             Status = status;
             DueDate = dueDate;
+        }*/
+        public Book(string title, string author, Status status, DeweyDecimal? deweyDecimal)
+        {
+            Title = title;
+            Author = author;
+            Status = status;
+            DueDate = AssignDueDate();
+            DeweyDecimal = deweyDecimal;
+        }
+        public Book(string title, string author, Status status, string dueDate, DeweyDecimal? deweyDecimal)
+        {
+            Title = title;
+            Author = author;
+            Status = status;
+            DateTime dueDateCopy;
+
+            bool IsDueDate = DateTime.TryParse(dueDate, out dueDateCopy);
+
+            if (IsDueDate == true)
+            {
+                DueDate = dueDateCopy;
+            }
+            else
+            {
+                DueDate = null;
+            }
+            DeweyDecimal = deweyDecimal;
+        }
+
+
+        public override string ToString()
+        {
+            return $"{Title}|{Author}|{(int)Status}|{(DueDate != null ? $"{DueDate:MM-dd-yyyy}" : "")}|{(DeweyDecimal != null ? $"{(int)DeweyDecimal}" : "")}";
         }
 
         public DateTime? AssignDueDate()
@@ -39,7 +84,8 @@ namespace LibraryTerminal_Project
                 dueDate = DateTime.Today.AddDays(2 * 7);
                 //wanna add a specific time of 5:00PM but can't figure out rn.
                 return DueDate = dueDate;
-            } else if (Status == Status.CheckedOut && DueDate != null)
+            }
+            else if (Status == Status.CheckedOut && DueDate != null)
             {
                 return DueDate;
             }

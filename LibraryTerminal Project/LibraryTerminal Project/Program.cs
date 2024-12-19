@@ -35,10 +35,6 @@ Optional enhancements:
 //Note: use selected Status so that user knows not to select the same book to check out. Only OnShelf items can be selected and Selected items can only be seleceted temporarily
 // they must either become CheckedOut or will turn back into OnShelf.
 
-
-
-
-
 //ADD STREAMWRITER AND READER TO SAVE INFO
 //Add greeting
 LibraryCatalog catalog = new LibraryCatalog();
@@ -48,12 +44,56 @@ int userNumSelect = -1;
 LibraryCatalog queriedMatchingBooks = new LibraryCatalog();
 queriedMatchingBooks.Books.Clear();
 //instantiate this data in class because it's mock data
-
+List<Book> testList = new List<Book>();
 string userCatalogQuery = "";
 string choice = "";
 
 //READ DATA 
 //ADD USER INFO COLLECTION BEFORE MENU
+
+
+try
+{
+    using (StreamReader reader = new StreamReader("catalog_File.txt"))
+    {
+        Book defaultBook = new Book();
+        catalog.Books.Clear();
+        string line;
+        while ((line = reader.ReadLine()) != null)
+        {
+
+            string[] parts = line.Split("|");
+            if (parts.Length == 5 || parts.Length == 4)
+            {
+                //COME BACK TO LATER
+                Book book = new Book(parts[0], parts[1], (Status)int.Parse(parts[2]), string.IsNullOrEmpty(parts[3]) ? null : parts[3], !string.IsNullOrEmpty(parts[4]) ? (DeweyDecimal)int.Parse(parts[4]) : null);
+                catalog.Books.Add(book);
+
+            }
+        }
+    }
+}
+catch (FileNotFoundException)
+{
+    Console.WriteLine("File not found");
+    Console.WriteLine("Using prepicked list of Books");
+    List<Book> prePickedBooks = new List<Book>()
+    {
+        new Book("Harry Potter", "J.K. Rowling", Status.OnShelf), new Book("Divergent", "Veronica Roth", Status.OnShelf),
+            new Book("Insurgent", "Veronica Roth", Status.CheckedOut/*, DateTime.Parse("12/12/1212")*/), //CHECK FOR INSERTING A DATETIME LITERAL
+            new Book("Allegiant", "Veronica Roth", Status.OnShelf),
+            new Book("Four", "Veronica Roth", Status.OnShelf), new Book("920 London", "Remy Boydell", Status.OnShelf),
+            new Book("To Kill A Mockingbird", "Harper Lee", Status.OnShelf), new Book("The Glass Castle", "Jeannette Walls", Status.OnShelf),
+            new Book("Deep Work", "Cal Newport", Status.OnShelf), new Book("Animal Farm", "George Orwell", Status.OnShelf),
+            new Book("The Great Gatsby", "F. Scott Fitzgerald", Status.OnShelf), new Book("The New Jim Crow: Mass Incarceration In The Age Of Colorblindness", "Michelle Alexander", Status.OnShelf),
+            new Book("Night", "Elie Wiesel", Status.OutOfStock), new Book("This Is Not a Personal Statement", "Tracy Badua", Status.CheckedOut),
+            new Book("The Odyssey", "Homer", Status.OnShelf),
+    };
+}
+
+
+
+
 
 
 while (true)
@@ -136,6 +176,9 @@ if (cart.Count > 0)
 else
 {
     Console.WriteLine("oops! cart is empty!\n Goodybye!");
+    Console.WriteLine("return a book");
+
+    ReturnBook();
 }
 
 //ADD RETURN METHOD || CHCECK
@@ -145,6 +188,15 @@ else
 //WRITE DATA
 
 
+using (StreamWriter catalogWriter = new StreamWriter("catalog_File.txt", false))
+{
+    foreach (Book book in catalog.Books)
+    {
+        catalogWriter.WriteLine(book.ToString());
+
+    }
+    
+}
 
 
 
@@ -169,7 +221,6 @@ void QueryCatalog()
         {
             case "y":
                 StageCheckOut(SelectBook(userCatalogQuery));
-                Console.WriteLine($"{SelectBook(userCatalogQuery).Title} has been added to your cart.");
                 break;
             case "n":
                 Console.WriteLine("Okay!");
@@ -241,9 +292,7 @@ void ReturnBook() //Tommy's
         Console.WriteLine($"You have returned \"{book.Title}\". Thank you!");
     }
 }
-static void SaveLibrary(List<Book> library)
-{ // Save library to a file (Optional Enhancement) Console.WriteLine("Library data saved. Goodbye!"); } } class Book { public string Title { get; set; }public string Author { get; set; } public string Status { get; set; } public string DueDate { get; set; } public Book(stringtitle, string author) { Title = title; Author = author; Status = "On Shelf"; DueDate = null; } public override stringToString() { return $"{Title} by {Author} - Status: {Status} {(DueDate != null ? $"(Due: {DueDate})" : "")}"; } }
-}
+
 
 void StageCheckOut(Book userChosenBook)
 {
@@ -272,11 +321,19 @@ void RemoveFromCart(List<Book> cart)
 List<Book> CheckOut(List<Book> cart)
 {
     List<Book> CheckedOutBooks = new List<Book>();
-    foreach (Book book in cart)
+    foreach (Book xBook in cart)
     {
-        book.Status = Status.CheckedOut;
-        book.AssignDueDate();
-        CheckedOutBooks.Add(book);
+        xBook.Status = Status.CheckedOut;
+        foreach (Book yBook in catalog.Books)
+        {
+            if (yBook.Title == xBook.Title)
+            {
+                yBook.Status = Status.CheckedOut;
+                yBook.AssignDueDate();
+            }
+        }
+        xBook.AssignDueDate();
+        CheckedOutBooks.Add(xBook);
     }
     cart.Clear();
     Console.WriteLine("The following books have been checked out:\n");
@@ -444,6 +501,7 @@ string AnswerYOrN()
     }
 }
 
+
 //Trashed Methods
 /*
 Book ValidateBookTitleSelection(string userChosenBookTitle)
@@ -486,7 +544,10 @@ Book ValidateBookTitleSelection(string userChosenBookTitle)
     return book;
 }*/ //overloading is hard >-<
 
-
+/*
+static void SaveLibrary(List<Book> library)
+{ // Save library to a file (Optional Enhancement) Console.WriteLine("Library data saved. Goodbye!"); } } class Book { public string Title { get; set; }public string Author { get; set; } public string Status { get; set; } public string DueDate { get; set; } public Book(stringtitle, string author) { Title = title; Author = author; Status = "On Shelf"; DueDate = null; } public override stringToString() { return $"{Title} by {Author} - Status: {Status} {(DueDate != null ? $"(Due: {DueDate})" : "")}"; } }
+}*/
 
 
 
