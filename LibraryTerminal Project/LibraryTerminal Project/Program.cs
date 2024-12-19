@@ -64,7 +64,6 @@ try
                     Book book = new Book(parts[0], parts[1], (Status)int.Parse(parts[2]), string.IsNullOrEmpty(parts[3]) ? null : parts[3], !string.IsNullOrEmpty(parts[4]) ? (DeweyDecimal)int.Parse(parts[4]) : null);
                     catalog.Books.Add(book);
                 }
-
             }
         }
 
