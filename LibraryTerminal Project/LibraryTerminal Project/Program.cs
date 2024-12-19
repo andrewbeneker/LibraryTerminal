@@ -67,7 +67,7 @@ try
             }
         }
 
-        Console.WriteLine("Library catalog is accounted for. ");
+        Console.WriteLine("Library catalog is accounted for!");
 
     }
 }
@@ -104,15 +104,6 @@ while (continueMenu == true)
     {
         continueMenu = false;
         CartMenu();
-        try
-        {
-            CheckOut(cart);
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            break;
-        }
-
         Console.Clear();
 
     }
@@ -269,6 +260,18 @@ void CartMenu()
     else
     {
         Console.WriteLine("oops! cart is empty!");
+        Console.WriteLine("Continue to menu? (\"y\"/\"n\")");
+        choice = AnswerYOrN();
+        switch (choice)
+        {
+            case "y":
+                break;
+            case "n":
+                Console.WriteLine("Goodbye!");
+                Environment.Exit(0);
+                break;
+
+        }
     }
 }
 
@@ -296,7 +299,7 @@ using (StreamWriter catalogWriter = new StreamWriter("catalog_File.txt", false))
 
 
 
-Console.ReadKey();
+
 void QueryCatalog()
 {
     //Could prob simplify by Validating and Selecting Book Title or Author into joined methods
@@ -427,19 +430,24 @@ List<Book> CheckOut(List<Book> cart)
         CheckedOutBooks.Add(xBook);
     }
     cart.Clear();
-    Console.WriteLine("The following books have been checked out:\n");
-    foreach (Book book in CheckedOutBooks)
+    if (cart.Count == 0)
     {
-        Console.WriteLine($"{book.Title} by {book.Author}");
+        Console.WriteLine("The following books have been checked out:\n");
+        foreach (Book book in CheckedOutBooks)
+        {
+            Console.WriteLine($"{book.Title} by {book.Author}");
 
+        }
+        try
+        {
+            Console.WriteLine($"They are all due: {CheckedOutBooks[0].DueDate}");
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            Console.WriteLine("There's no book in the cart.");
+        }
     }
-    try
-    {
-        Console.WriteLine($"They are all due: {CheckedOutBooks[0].DueDate}");
-    } catch (ArgumentOutOfRangeException)
-    {
-        Console.WriteLine("There's no book in the cart.");
-    }
+    Console.ReadKey();
     return CheckedOutBooks;
 }
 
